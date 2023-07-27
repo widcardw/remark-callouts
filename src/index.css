@@ -1,0 +1,316 @@
+:root {
+  --callout-note: 68, 138, 255;
+  --callout-abstract: 0, 176, 255;
+  --callout-info: 0, 184, 212;
+  --callout-tip: 0, 191, 165;
+  --callout-success: 8, 185, 78;
+  --callout-question: 224, 172, 0;
+  --callout-warning: 255, 145, 0;
+  --callout-failure: 255, 82, 82;
+  --callout-danger: 255, 23, 68;
+  --callout-bug: 245, 0, 87;
+  --callout-example: 124, 77, 255;
+  --callout-quote: 158, 158, 158;
+  --callout-radius: 0px;
+  --callout-border-opacity: 0.5;
+  --callout-title-bg-opacity: 0.08;
+}
+
+.callout-fold::before {
+  align-self: center;
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="grey" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+}
+
+.callout-fold {
+  transform: rotate(-90deg);
+  transition: cubic-bezier(0.075, 0.82, 0.165, 1) 500ms;
+  display: flex;
+}
+
+/*
+.callout {
+    border-left: 3px solid;
+    border-radius: var(--callout-radius);
+    margin: 1rem 0;
+    padding: 0;
+    --un-shadow: var(--un-shadow-inset) 0 1px 3px 0 var(--un-shadow-color, rgba(127,127,127,0.1)),var(--un-shadow-inset) 0 1px 2px -1px var(--un-shadow-color, rgba(127,127,127,0.1));
+    box-shadow: var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow);
+}
+*/
+.callout[open]>summary>.callout-fold {
+  transform: rotate(0deg);
+}
+
+.callout>summary {
+  padding: 1rem;
+  margin: 0;
+  border-top-left-radius: var(--callout-radius);
+  border-top-right-radius: var(--callout-radius);
+  cursor: pointer;
+}
+
+.callout>summary::marker {
+  content: '';
+}
+
+.callout>summary::before {
+  margin-right: 0.5rem;
+}
+
+.callout>summary::-webkit-details-marker {
+  display: none;
+}
+
+.callout-title {
+  /* font-weight: 700; */
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.callout>.callout-content {
+  position: relative;
+  border-left: none;
+  margin: 0 !important;
+  background: #7f7f7f05 !important;
+  padding: 0.5rem 1rem;
+}
+
+.callout>.callout-content>p {
+  margin: 8px 0;
+}
+
+.callout>.callout-content>pre {
+  margin: 1.25rem -1rem 1.25rem -1rem;
+}
+
+.callout>.callout-content>pre:first-child {
+  margin-top: -0.75rem;
+}
+
+.callout>.callout-content>pre:last-child {
+  margin-bottom: -0.75rem;
+}
+
+.callout.note,
+.callout.seealso {
+  border-color: rgba(var(--callout-note), var(--callout-border-opacity));
+}
+
+.callout.note>summary,
+.callout.seealso>summary {
+  background-color: rgba(var(--callout-note), var(--callout-title-bg-opacity));
+}
+
+.callout.abstract,
+.callout.summary,
+.callout.tldr {
+  border-color: rgba(var(--callout-abstract), var(--callout-border-opacity));
+}
+
+.callout.abstract>summary,
+.callout.summary>summary,
+.callout.tldr>summary {
+  background-color: rgba(var(--callout-abstract), var(--callout-title-bg-opacity));
+}
+
+.callout.info,
+.callout.todo {
+  border-color: rgba(var(--callout-info), var(--callout-border-opacity));
+}
+
+.callout.info>summary,
+.callout.todo>summary {
+  background-color: rgba(var(--callout-info), var(--callout-title-bg-opacity));
+}
+
+.callout.tip,
+.callout.hint,
+.callout.important {
+  border-color: rgba(var(--callout-tip), var(--callout-border-opacity));
+}
+
+.callout.tip>summary,
+.callout.hint>summary,
+.callout.important>summary {
+  background-color: rgba(var(--callout-tip), var(--callout-title-bg-opacity));
+}
+
+.callout.success,
+.callout.check,
+.callout.done {
+  border-color: rgba(var(--callout-success), var(--callout-border-opacity));
+}
+
+.callout.success>summary,
+.callout.check>summary,
+.callout.done>summary {
+  background-color: rgba(var(--callout-success), var(--callout-title-bg-opacity));
+
+}
+
+.callout.question,
+.callout.help,
+.callout.faq {
+  border-color: rgba(var(--callout-question), var(--callout-border-opacity));
+}
+
+.callout.question>summary,
+.callout.help>summary,
+.callout.faq>summary {
+  background-color: rgba(var(--callout-question), var(--callout-title-bg-opacity));
+}
+
+.callout.warning,
+.callout.caution,
+.callout.attention {
+  border-color: rgba(var(--callout-warning), var(--callout-border-opacity));
+}
+
+.callout.warning>summary,
+.callout.caution>summary,
+.callout.attention>summary {
+  background-color: rgba(var(--callout-warning), var(--callout-title-bg-opacity));
+}
+
+.callout.failure,
+.callout.fail,
+.callout.missing {
+  border-color: rgba(var(--callout-failure), var(--callout-border-opacity));
+}
+
+.callout.failure>summary,
+.callout.fail>summary,
+.callout.missing>summary {
+  background-color: rgba(var(--callout-failure), var(--callout-title-bg-opacity));
+
+}
+
+.callout.danger,
+.callout.error {
+  border-color: rgba(var(--callout-danger), var(--callout-border-opacity));
+}
+
+.callout.danger>summary,
+.callout.error>summary {
+  background-color: rgba(var(--callout-danger), var(--callout-title-bg-opacity));
+}
+
+.callout.bug {
+  border-color: rgba(var(--callout-bug), var(--callout-border-opacity));
+
+}
+
+.callout.bug>summary {
+  background-color: rgba(var(--callout-bug), var(--callout-title-bg-opacity));
+}
+
+.callout.example {
+  border-color: rgba(var(--callout-example), var(--callout-border-opacity));
+}
+
+.callout.example>summary {
+  background-color: rgba(var(--callout-example), var(--callout-title-bg-opacity));
+}
+
+.callout.quote,
+.callout.cite {
+  border-color: rgba(var(--callout-quote), var(--callout-border-opacity));
+}
+
+.callout.quote>summary,
+.callout.cite>summary {
+  background-color: rgba(var(--callout-quote), var(--callout-title-bg-opacity));
+}
+
+.callout-title>.callout-icon+div {
+  -webkit-box-flex: 1;
+  -ms-flex: 1 1 0%;
+  -webkit-flex: 1 1 0%;
+  flex: 1 1 0%;
+  margin-left: 0.25rem;
+}
+
+.callout-icon {
+  display: flex;
+  align-items: center;
+  color: black;
+}
+
+.callout-icon::before {
+  width: 20px;
+  height: 20px;
+}
+
+.callout.caution>.callout-title>.callout-icon::before,
+.callout.warning>.callout-title>.callout-icon::before,
+.callout.attention>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(255, 145, 0)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>');
+}
+
+.callout.note>.callout-title>.callout-icon::before,
+.callout.seealso>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(68, 138, 255)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-pencil"><line x1="18" y1="2" x2="22" y2="6"></line><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"></path></svg>');
+}
+
+.callout.abstract>.callout-title>.callout-icon::before,
+.callout.summary>.callout-title>.callout-icon::before,
+.callout.tldr>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(0, 176, 255)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-clipboard-list"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg>');
+}
+
+.callout.info>.callout-title>.callout-icon::before,
+.callout.todo>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(0, 184, 212)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-check-circle-2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>')
+}
+
+.callout.tip>.callout-title>.callout-icon::before,
+.callout.hint>.callout-title>.callout-icon::before,
+.callout.important>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(0, 191, 165)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-flame"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>')
+}
+
+.callout.success>.callout-title>.callout-icon::before,
+.callout.check>.callout-title>.callout-icon::before,
+.callout.done>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(0, 200, 83)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-check"><polyline points="20 6 9 17 4 12"></polyline></svg>')
+}
+
+.callout.question>.callout-title>.callout-icon::before,
+.callout.help>.callout-title>.callout-icon::before,
+.callout.faq>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(224, 172, 0)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>')
+}
+
+.callout.failure>.callout-title>.callout-icon::before,
+.callout.fail>.callout-title>.callout-icon::before,
+.callout.missing>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(255, 82, 82)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>')
+}
+
+.callout.danger>.callout-title>.callout-icon::before,
+.callout.error>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(255, 23, 68)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>')
+}
+
+.callout.bug>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(245, 0, 87)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-bug"><rect x="8" y="6" width="8" height="14" rx="4"></rect><path d="m19 7-3 2"></path><path d="m5 7 3 2"></path><path d="m19 19-3-2"></path><path d="m5 19 3-2"></path><path d="M20 13h-4"></path><path d="M4 13h4"></path><path d="m10 4 1 2"></path><path d="m14 4-1 2"></path></svg>');
+}
+
+.callout.example>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(124, 77, 255)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-list"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>')
+}
+
+.callout.quote>.callout-title>.callout-icon::before,
+.callout.cite>.callout-title>.callout-icon::before {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(158, 158, 158)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-quote"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path></svg>')
+}
+
+.callout {
+  border-left: 3px solid;
+  border-radius: var(--callout-radius);
+  margin: 1rem 0;
+  padding: 0;
+  --un-shadow: var(--un-shadow-inset) 0 1px 3px 0 var(--un-shadow-color, rgba(127, 127, 127, 0.1)), var(--un-shadow-inset) 0 1px 2px -1px var(--un-shadow-color, rgba(127, 127, 127, 0.1));
+  box-shadow: var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow);
+}

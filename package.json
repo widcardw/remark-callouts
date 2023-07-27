@@ -12,7 +12,7 @@
   "scripts": {
     "test": "vitest --run",
     "build": "tsup ./src/index.ts --format cjs,esm --dts && postcss ./src/index.css > ./dist/index.css",
-    "release": "bumpp && npm publish"
+    "release": "bumpp && npm publish --access public"
   },
   "sideEffects": false,
   "exports": {

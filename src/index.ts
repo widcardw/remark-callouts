@@ -94,7 +94,7 @@ function visitBlock(ast: Node) {
     let titleNode = null
     const indexOfBreak = paragraph.children.findIndex(i => i.type === 'break')
     if (indexOfBreak !== -1) rest = paragraph.children.slice(indexOfBreak + 1)
-    if (title) {
+    if (title && title.trim() !== '') {
       if (indexOfBreak !== -1) {
         paragraph.children[0].value = paragraph.children[0].value.replace(new RegExp(`\\[!${key}\\][\t\f ]*`, 'i'), '')
         titleNode = {
@@ -112,7 +112,7 @@ function visitBlock(ast: Node) {
     else {
       titleNode = {
         type: 'text',
-        children: keyword.charAt(0).toUpperCase() + keyword.slice(1)
+        value: keyword.charAt(0).toUpperCase() + keyword.slice(1)
       }
     }
 

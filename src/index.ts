@@ -91,29 +91,29 @@ function visitBlock(ast: Node) {
 
     const keyword = key.toLowerCase()
 
-    let titleNode = null
+    let titleNode = {
+      type: 'element',
+      tagName: 'div',
+      children: [] as any[],
+      data: {
+        hProperties: {
+          className: 'callout-title-content'
+        }
+      }
+    }
     const indexOfBreak = paragraph.children.findIndex(i => i.type === 'break')
     if (indexOfBreak !== -1) rest = paragraph.children.slice(indexOfBreak + 1)
     if (title && title.trim() !== '') {
       if (indexOfBreak !== -1) {
         paragraph.children[0].value = paragraph.children[0].value.replace(new RegExp(`\\[!${key}\\][\t\f ]*`, 'i'), '')
-        titleNode = {
-          type: 'element',
-          tagName: 'div',
-          children: paragraph.children.slice(0, indexOfBreak),
-          data: {
-            hProperties: {
-              className: 'callout-title-content'
-            }
-          }
-        }
+        titleNode.children.push(...paragraph.children.slice(0, indexOfBreak))
       }
     }
     else {
-      titleNode = {
+      titleNode.children.push({
         type: 'text',
         value: keyword.charAt(0).toUpperCase() + keyword.slice(1)
-      }
+      })
     }
 
     const fullTitleNode = {

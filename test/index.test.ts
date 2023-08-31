@@ -23,6 +23,13 @@ const md3 = `
 > a
 `
 
+const md4 = `
+> [!note] abcd
+> \`\`\`c
+> int main()
+> \`\`\`
+`
+
 describe('generate blockquote', () => {
   it('should generate node', async () => {
     const processor = unified()
@@ -40,8 +47,16 @@ describe('generate blockquote', () => {
 
     expect(String(await processor.process(md3))).toMatchInlineSnapshot(`
       "<div><details class=\\"callout note\\" open>
-      <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div>Note<div class=\\"callout-fold\\"></div></summary>
+      <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">Note</div><div class=\\"callout-fold\\"></div></summary>
       <div class=\\"callout-content\\"><p>a</p></div>
+      </details></div>"
+    `)
+
+    expect(String(await processor.process(md4))).toMatchInlineSnapshot(`
+      "<div><details class=\\"callout note\\" open>
+      <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">abcd</div><div class=\\"callout-fold\\"></div></summary>
+      <div class=\\"callout-content\\"><pre><code class=\\"language-c\\">int main()
+      </code></pre></div>
       </details></div>"
     `)
   })

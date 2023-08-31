@@ -108,6 +108,9 @@ function visitBlock(ast: Node) {
         paragraph.children[0].value = paragraph.children[0].value.replace(new RegExp(`\\[!${key}\\][\t\f ]*`, 'i'), '')
         titleNode.children.push(...paragraph.children.slice(0, indexOfBreak))
       }
+      else {
+        titleNode.children.push({ type: 'text', value: title })
+      }
     }
     else {
       titleNode.children.push({
@@ -131,12 +134,12 @@ function visitBlock(ast: Node) {
       }
     }
 
+    const contentChildren = [...blockquote.children.slice(1)]
+    if (rest.length) contentChildren.unshift({ type: 'paragraph', children: rest })
+
     const contentNode = {
       type: "element",
-      children: [
-        { type: 'paragraph', children: rest },
-        ...blockquote.children.slice(1)
-      ],
+      children: contentChildren,
       data: {
         hProperties: {
           className: "callout-content",

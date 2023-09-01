@@ -105,7 +105,7 @@ function visitBlock(ast: Node) {
     if (indexOfBreak !== -1) rest = paragraph.children.slice(indexOfBreak + 1)
     if (title && title.trim() !== '') {
       if (indexOfBreak !== -1) {
-        paragraph.children[0].value = paragraph.children[0].value.replace(new RegExp(`\\[!${key}\\][\t\f ]*`, 'i'), '')
+        paragraph.children[0].value = paragraph.children[0].value.replace(new RegExp(`\\[!${key}(\\|(?<open>(open|closed)))?\\][\t\f ]*`, 'i'), '')
         titleNode.children.push(...paragraph.children.slice(0, indexOfBreak))
       }
       else {

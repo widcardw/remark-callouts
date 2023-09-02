@@ -4,7 +4,7 @@ import { BuildVisitor, visit } from "unist-util-visit";
 
 const REG = new RegExp(
   `^\\[!(?<keyword>(.*?))(\\|(?<open>(open|closed)))?\\][\t\f ]?(?<title>.*?)$`,
-  "gi"
+  "i"
 )
 
 const CALLOUTTITLE = '__callout-title'
@@ -45,7 +45,7 @@ function visitLeading(ast: Node) {
       j && restNodes.push({ type: 'text', value: j })
     }
     // only match [!xxx] like nodes
-    const m = REG.exec(firstChild.value)
+    const m = firstChild.value.match(REG)
     if (!m) return
     const [key, title, open] = [m.groups?.keyword, m.groups?.title, m.groups?.open]
     if (!key) return

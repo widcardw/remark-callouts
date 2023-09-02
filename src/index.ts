@@ -101,7 +101,6 @@ function visitBlock(ast: Node) {
       children: [
         { type: 'element', data: { hProperties: { className: 'callout-icon' } } },
         titleContent,
-        { type: 'element', data: { hProperties: { className: 'callout-fold' } } }
       ],
       data: {
         hProperties: {
@@ -131,8 +130,10 @@ function visitBlock(ast: Node) {
       Object.assign(hProperties, { open: true }, hProperties)
 
     const children: any[] = [titleNode]
-    if (calloutBody.length > 0)
+    if (calloutBody.length > 0) {
       children.push(calloutNode)
+      titleNode.children.push({ type: 'element', data: { hProperties: { className: 'callout-fold' } } })
+    }
     node.children = children
     node.data = {
       ...node.data,

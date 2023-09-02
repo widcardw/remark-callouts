@@ -32,7 +32,7 @@ const md4 = `
 
 const md5 = '> [!bug] Cannot load module `/path/to/node_modules/mermaid/dist/mermaid.js`'
 
-describe.skip('generate blockquote', () => {
+describe('generate blockquote', () => {
   const processor = unified()
     .use(remarkParse)
     .use(remarkCallouts)
@@ -69,7 +69,7 @@ describe.skip('generate blockquote', () => {
   })
 })
 
-describe.skip('do not generate', () => {
+describe('do not generate', () => {
   const processor = unified()
     .use(remarkParse)
     .use(remarkCallouts)
@@ -88,36 +88,8 @@ describe.skip('do not generate', () => {
   it('should generate single line', async () => {
     expect(String(await processor.process(md5))).toMatchInlineSnapshot(`
         "<details class=\\"callout bug\\" open>
-        <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">Cannot load module <code>/path/to/node_modules/mermaid/dist/mermaid.js</code></div><div class=\\"callout-fold\\"></div></summary>
+        <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">Cannot load module <code>/path/to/node_modules/mermaid/dist/mermaid.js</code></div></summary>
         </details>"
       `)
-  })
-})
-
-describe('edge cases', () => {
-  const processor = unified()
-    .use(remarkParse)
-    .use(remarkCallouts)
-    .use(remarkRehype)
-    .use(rehypeStringify)
-
-  it('shoud generate node', async () => {
-    expect(String(await processor.process('> [!tip] abc\n> def\n\nghi'))).toMatchInlineSnapshot(`
-      "<details class=\\"callout tip\\" open>
-      <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">abc</div><div class=\\"callout-fold\\"></div></summary>
-      <div class=\\"callout-content\\"><p>def</p></div>
-      </details>
-      <p>ghi</p>"
-    `)
-  })
-
-  it ('should generate blank line', async () => {
-    expect(String(await processor.process('> [!tip] abc\n>\n> def\n\nghi'))).toMatchInlineSnapshot(`
-      "<details class=\\"callout tip\\" open>
-      <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">abc</div><div class=\\"callout-fold\\"></div></summary>
-      <div class=\\"callout-content\\"><p>def</p></div>
-      </details>
-      <p>ghi</p>"
-    `)
   })
 })

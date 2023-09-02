@@ -1,154 +1,128 @@
-import type { Plugin } from 'unified'
-import type { Parent } from 'unist'
-import { BuildVisitor, visit } from 'unist-util-visit'
-import type { Blockquote, Text, BlockContent, Node } from 'mdast'
+import { Plugin } from "unified";
+import { Blockquote, Node, Paragraph, Parent, Root } from 'mdast'
+import { BuildVisitor, visit } from "unist-util-visit";
 
-const BLANK_REG = /[\t ]*(?:\r?\n|\r)/g
+const REG = new RegExp(
+  `^\\[!(?<keyword>(.*?))(\\|(?<open>(open|closed)))?\\][\t\f ]?(?<title>.*?)$`,
+  "gi"
+)
+
+const CALLOUTTITLE = '__callout-title'
+
+interface CalloutConfig {
+  key: string
+  open: string | undefined
+}
+
+interface CalloutNode {
+  type: string
+  children: Node[]
+  data: { calloutConfig: CalloutConfig }
+}
 
 function visitLeading(ast: Node) {
-  const visitor: BuildVisitor<Node, 'text'> = (node: Text, index: number, parent: Parent) => {
-    const result = []
-    let start = 0
-    BLANK_REG.lastIndex = 0
-
-    let match = BLANK_REG.exec(node.value)
-
-    while (match) {
-      const position = match.index
-
-      if (start !== position) {
-        result.push({
-          type: "text",
-          value: node.value.slice(start, position),
-        })
+  const visitor: BuildVisitor<Node, 'paragraph'> = (node: Paragraph, index: number, parent: Parent) => {
+    const titleNodes = []
+    const children = node.children
+    let i = 0
+    for (; i < children.length; i++) {
+      const child = children[i]
+      if (child.type !== 'text' || (child.type === 'text' && !child.value.startsWith('\n'))) {
+        titleNodes.push(child)
+        continue
       }
-
-      result.push({ type: "break" })
-      start = position + match[0].length
-      match = BLANK_REG.exec(node.value)
+      break
     }
+    const restNodes = children.slice(i)
+    if (titleNodes.length === 0) return
 
-    if (result.length > 0 && parent && typeof index === "number") {
-      if (start < node.value.length) {
-        result.push({ type: "text", value: node.value.slice(start) })
+    const firstChild = titleNodes[0]
+    // only match text nodes
+    if (firstChild.type !== 'text') return
+    if (firstChild.value.includes('\n')) {
+      const [i, j] = firstChild.value.split('\n')
+      firstChild.value = i
+      j && restNodes.push({ type: 'text', value: j })
+    }
+    // only match [!xxx] like nodes
+    const m = REG.exec(firstChild.value)
+    if (!m) return
+    const [key, title, open] = [m.groups?.keyword, m.groups?.title, m.groups?.open]
+    if (!key) return
+    // remove the [!xxx] like label
+    if (!title) titleNodes.shift()
+    else firstChild.value = title
+
+    // replace the title nodes and the rest nodes
+    const titleNode: any = {
+      type: CALLOUTTITLE,
+      children: titleNodes,
+      data: {
+        calloutConfig: { key, open },
       }
-
-      parent.children.splice(index, 1, ...result)
-      return index + result.length
     }
+    if (restNodes.length > 0 && restNodes[0].type === 'text')
+      restNodes[0].value = restNodes[0].value.replace(/^\n/, '')
+    let restNode: Paragraph
+    const f = [titleNode]
+    if (restNodes.length > 0) {
+      restNode = {
+        type: 'paragraph',
+        children: restNodes,
+      }
+      f.push(restNode)
+    }
+    parent.children.splice(index, 1, ...f)
   }
-  return visit(ast, 'text', visitor)
+  return visit(ast, 'paragraph', visitor)
 }
 
 function visitBlock(ast: Node) {
-  const visitor: BuildVisitor<Node, 'blockquote'> = (node: Blockquote, index: number, parent: Parent) => {
+  const visitor: BuildVisitor<Node, 'blockquote'> = (node: Blockquote, index: number, parent: Root) => {
     visitLeading(node)
-
-    // wrap blockquote in a div
-    const wrapper = {
-      ...node,
-      type: "element",
-      tagName: "div",
-      data: {
-        hProperties: {},
-      },
-      children: [node],
-    }
-
-    parent.children.splice(Number(index), 1, wrapper)
-
-    const blockquote = wrapper.children[0] as Blockquote
-
-    // check for callout syntax starts here
-    if (
-      blockquote.children.length <= 0 ||
-      blockquote.children[0].type !== "paragraph"
-    )
-      return
-    const paragraph = blockquote.children[0]
-
-    if (
-      paragraph.children.length <= 0 ||
-      paragraph.children[0].type !== "text"
-    )
-      return
-
-    let [t, ...rest] = paragraph.children
-
-    const regex = new RegExp(
-      `^\\[!(?<keyword>(.*?))(\\|(?<open>(open|closed)))?\\][\t\f ]?(?<title>.*?)$`,
-      "gi"
-    )
-    const m = regex.exec(t.value)
-
-    // if no callout syntax, forget about it.
-    if (!m) return
-
-    const [key, title, open] = [m.groups?.keyword, m.groups?.title, m.groups?.open]
-
-    // if there's nothing inside the brackets, is it really a callout ?
-    if (!key) return
-
+    const firstChild = node.children[0] as CalloutNode
+    if (firstChild.type !== CALLOUTTITLE) return
+    const calloutConfig = firstChild.data.calloutConfig
+    const { key, open } = calloutConfig
     const keyword = key.toLowerCase()
 
-    let titleNode = {
+    const titleContent = {
       type: 'element',
-      tagName: 'div',
-      children: [] as any[],
+      children: firstChild.children.length ? firstChild.children : [{ type: 'text', value: keyword.charAt(0).toUpperCase() + keyword.slice(1) }],
       data: {
         hProperties: {
-          className: 'callout-title-content'
+          className: 'callout-title-content',
         }
       }
     }
-    const indexOfBreak = paragraph.children.findIndex(i => i.type === 'break')
-    if (indexOfBreak !== -1) rest = paragraph.children.slice(indexOfBreak + 1)
-    if (title && title.trim() !== '') {
-      if (indexOfBreak !== -1) {
-        paragraph.children[0].value = paragraph.children[0].value.replace(new RegExp(`\\[!${key}(\\|(?<open>(open|closed)))?\\][\t\f ]*`, 'i'), '')
-        titleNode.children.push(...paragraph.children.slice(0, indexOfBreak))
-      }
-      else {
-        titleNode.children.push({ type: 'text', value: title })
-      }
-    }
-    else {
-      titleNode.children.push({
-        type: 'text',
-        value: keyword.charAt(0).toUpperCase() + keyword.slice(1)
-      })
-    }
 
-    const fullTitleNode = {
+    const titleNode = {
       type: 'element',
       children: [
-        { type: 'element', tagName: 'div', data: { hProperties: { className: 'callout-icon' } } },
-        titleNode,
-        { type: 'element', tagName: 'div', data: { hProperties: { className: 'callout-fold' } } }
+        { type: 'element', data: { hProperties: { className: 'callout-icon' } } },
+        titleContent,
+        { type: 'element', data: { hProperties: { className: 'callout-fold' } } }
       ],
       data: {
         hProperties: {
-          className: `callout-title`,
+          className: 'callout-title',
         },
-        hName: 'summary',
+        hName: 'summary'
       }
     }
 
-    const contentChildren = [...blockquote.children.slice(1)]
-    if (rest.length) contentChildren.unshift({ type: 'paragraph', children: rest })
-
-    const contentNode = {
-      type: "element",
-      children: contentChildren,
+    const calloutBody = node.children.slice(1)
+    const calloutNode = {
+      type: 'element',
+      children: calloutBody,
       data: {
         hProperties: {
-          className: "callout-content",
-        },
-      },
+          className: 'callout-content'
+        }
+      }
     }
-    blockquote.children = [fullTitleNode, contentNode] as BlockContent[]
 
-    const hProperties = {
+    let hProperties = {
       className: `callout ${keyword}`
     }
 
@@ -156,17 +130,20 @@ function visitBlock(ast: Node) {
       || (key !== 'example' && open !== 'closed'))
       Object.assign(hProperties, { open: true }, hProperties)
 
-    blockquote.data = {
-      ...blockquote.data,
+    const children: any[] = [titleNode]
+    if (calloutBody.length > 0)
+      children.push(calloutNode)
+    node.children = children
+    node.data = {
+      ...node.data,
       hName: 'details',
       hProperties,
     }
   }
-
   return visit(ast, 'blockquote', visitor)
 }
 
-const plugin: Plugin = function () {
+const plugin: Plugin<[], 'blockquote'> = () => {
   return function transformer(ast: Node, vFile: any, next: any) {
     visitBlock(ast)
     if (typeof next === 'function')

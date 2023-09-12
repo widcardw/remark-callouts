@@ -1,5 +1,5 @@
 import { Plugin } from "unified";
-import { Blockquote, Node, Paragraph, Parent, Root } from 'mdast'
+import { Blockquote, Node, Paragraph, Parent, Root, Text } from 'mdast'
 import { BuildVisitor, visit } from "unist-util-visit";
 
 const REG = new RegExp(
@@ -25,25 +25,38 @@ function visitLeading(ast: Node) {
     const titleNodes = []
     const children = node.children
     let i = 0
+    let flag = -1
     for (; i < children.length; i++) {
       const child = children[i]
-      if (child.type !== 'text' || (child.type === 'text' && !child.value.startsWith('\n'))) {
+      if (child.type !== 'text' || (child.type === 'text' && !child.value.includes('\n'))) {
         titleNodes.push(child)
         continue
       }
+      if (/* child.type === 'text' && */ child.value.includes('\n'))
+        flag = child.value.indexOf('\n')
       break
     }
+
     const restNodes = children.slice(i)
+
+    if (flag !== -1) {
+      titleNodes.push({ type: 'text', value: (children[i] as Text).value.slice(0, flag)});
+      (restNodes[0] as Text).value = (children[i] as Text).value.slice(flag + 1);
+    }
+    
     if (titleNodes.length === 0) return
 
     const firstChild = titleNodes[0]
     // only match text nodes
     if (firstChild.type !== 'text') return
-    if (firstChild.value.includes('\n')) {
-      const [i, j] = firstChild.value.split('\n')
-      firstChild.value = i
-      j && restNodes.push({ type: 'text', value: j })
-    }
+
+    // deprecated because the flag already implement the split feature
+    // if (firstChild.value.includes('\n')) {
+    //   const [i, j] = firstChild.value.split('\n')
+    //   firstChild.value = i
+    //   j && restNodes.push({ type: 'text', value: j })
+    // }
+
     // only match [!xxx] like nodes
     const m = firstChild.value.match(REG)
     if (!m) return

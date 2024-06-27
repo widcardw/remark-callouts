@@ -14,29 +14,29 @@ describe('edge cases', () => {
 
   it('shoud generate node', async () => {
     expect(String(await processor.process('> [!tip] abc\n> def\n\nghi'))).toMatchInlineSnapshot(`
-        "<details class=\\"callout tip\\" open>
-        <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">abc</div><div class=\\"callout-fold\\"></div></summary>
-        <div class=\\"callout-content\\"><p>def</p></div>
-        </details>
-        <p>ghi</p>"
-      `)
+      "<details class="callout tip" open>
+      <summary class="callout-title"><div class="callout-icon"></div><div class="callout-title-content">abc</div><div class="callout-fold"></div></summary>
+      <div class="callout-content"><p>def</p></div>
+      </details>
+      <p>ghi</p>"
+    `)
   })
 
   it('should generate blank line', async () => {
     expect(String(await processor.process('> [!tip] abc\n>\n> def\n\nghi'))).toMatchInlineSnapshot(`
-        "<details class=\\"callout tip\\" open>
-        <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">abc</div><div class=\\"callout-fold\\"></div></summary>
-        <div class=\\"callout-content\\"><p>def</p></div>
-        </details>
-        <p>ghi</p>"
-      `)
+      "<details class="callout tip" open>
+      <summary class="callout-title"><div class="callout-icon"></div><div class="callout-title-content">abc</div><div class="callout-fold"></div></summary>
+      <div class="callout-content"><p>def</p></div>
+      </details>
+      <p>ghi</p>"
+    `)
   })
 
   it('should generate code in title', async () => {
     expect(String(await processor.process('> [!tip] abc\n> ghi `jkl`'))).toMatchInlineSnapshot(`
-      "<details class=\\"callout tip\\" open>
-      <summary class=\\"callout-title\\"><div class=\\"callout-icon\\"></div><div class=\\"callout-title-content\\">abc</div><div class=\\"callout-fold\\"></div></summary>
-      <div class=\\"callout-content\\"><p>ghi <code>jkl</code></p></div>
+      "<details class="callout tip" open>
+      <summary class="callout-title"><div class="callout-icon"></div><div class="callout-title-content">abc</div><div class="callout-fold"></div></summary>
+      <div class="callout-content"><p>ghi <code>jkl</code></p></div>
       </details>"
     `)
   })

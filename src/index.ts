@@ -20,6 +20,12 @@ interface CalloutNode {
   data: { calloutConfig: CalloutConfig }
 }
 
+interface CalloutParameters {
+  leadingIcon?: boolean
+  foldIcon?: boolean
+  customClass?: string
+}
+
 function visitLeading(ast: Node) {
   const visitor: BuildVisitor<Node, 'paragraph'> = (node: Paragraph, index: number, parent: Parent) => {
     const titleNodes = []
@@ -40,10 +46,10 @@ function visitLeading(ast: Node) {
     const restNodes = children.slice(i)
 
     if (flag !== -1) {
-      titleNodes.push({ type: 'text', value: (children[i] as Text).value.slice(0, flag)});
+      titleNodes.push({ type: 'text', value: (children[i] as Text).value.slice(0, flag) });
       (restNodes[0] as Text).value = (children[i] as Text).value.slice(flag + 1);
     }
-    
+
     if (titleNodes.length === 0) return
 
     const firstChild = titleNodes[0]
@@ -90,7 +96,7 @@ function visitLeading(ast: Node) {
   return visit(ast, 'paragraph', visitor)
 }
 
-function visitBlock(ast: Node) {
+function visitBlock(ast: Node, config: CalloutParameters) {
   const visitor: BuildVisitor<Node, 'blockquote'> = (node: Blockquote, index: number, parent: Root) => {
     visitLeading(node)
     const firstChild = node.children[0] as CalloutNode
@@ -109,15 +115,18 @@ function visitBlock(ast: Node) {
       }
     }
 
+    const titleChildren: any[] = [titleContent]
+    if (config.leadingIcon)
+      titleChildren.unshift(
+        { type: 'element', data: { hProperties: { className: 'callout-icon' } } }
+      )
+
     const titleNode = {
       type: 'element',
-      children: [
-        { type: 'element', data: { hProperties: { className: 'callout-icon' } } },
-        titleContent,
-      ],
+      children: titleChildren,
       data: {
         hProperties: {
-          className: 'callout-title',
+          className: ['callout-title', config.customClass],
         },
         hName: 'summary'
       }
@@ -129,13 +138,13 @@ function visitBlock(ast: Node) {
       children: calloutBody,
       data: {
         hProperties: {
-          className: 'callout-content'
+          className: ['callout-content', config.customClass]
         }
       }
     }
 
     let hProperties = {
-      className: `callout ${keyword}`
+      className: [`callout ${keyword}`, config.customClass]
     }
 
     if (open === 'open'
@@ -145,7 +154,8 @@ function visitBlock(ast: Node) {
     const children: any[] = [titleNode]
     if (calloutBody.length > 0) {
       children.push(calloutNode)
-      titleNode.children.push({ type: 'element', data: { hProperties: { className: 'callout-fold' } } })
+      if (config.foldIcon)
+        titleNode.children.push({ type: 'element', data: { hProperties: { className: 'callout-fold' } } })
     }
     node.children = children
     node.data = {
@@ -157,9 +167,13 @@ function visitBlock(ast: Node) {
   return visit(ast, 'blockquote', visitor)
 }
 
-const plugin: Plugin<[], 'blockquote'> = () => {
+const plugin = (cfg: CalloutParameters = {}) => {
+  const leadingIcon = cfg.leadingIcon !== undefined ? cfg.leadingIcon : true
+  const foldIcon = cfg.foldIcon !== undefined ? cfg.foldIcon : true
+  const customClass = cfg.customClass !== undefined ? cfg.customClass : ''
+  
   return function transformer(ast: Node, vFile: any, next: any) {
-    visitBlock(ast)
+    visitBlock(ast, { leadingIcon, foldIcon, customClass })
     if (typeof next === 'function')
       return next(null, ast, vFile)
     return ast

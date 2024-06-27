@@ -20,8 +20,14 @@ import { remarkCallouts } from '@widcardw/remark-callouts'
 export default defineConfig({
   // ...
   markdown: {
-    remarkPlugins: [remarkCallouts],
-    //              ^^^^^^^^^^^^^^
+    remarkPlugins: [
+      remarkCallouts, 
+      { 
+        leadingIcon: true, // (optional, default: true) add loading icon to the start of summary
+        foldIcon: true, // (optional, default: true) add fold icon to the end of summary
+        customClass: '__custom_callout', // (optional) ass custom class to <detail> and <summary>
+      },
+    ],
   },
 })
 ```
